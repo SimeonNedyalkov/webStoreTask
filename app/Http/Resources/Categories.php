@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
-class ProductsResource extends JsonResource
+class Categories extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,11 +18,8 @@ class ProductsResource extends JsonResource
             "id"=>$this->id,
             "description"=>$this->description,
             "name"=>$this->name,
-            "price"=>$this->price,
-            'category' => new Categories($this->category),
-            "imagePath"=>$this->imagePath,
             'createdBy'=>new UserResource($this->createdBy),
             'updatedBy'=>new UserResource($this->updatedBy),
-        ];
+        ]
     }
 }

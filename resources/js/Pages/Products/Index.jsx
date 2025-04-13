@@ -56,23 +56,33 @@ export default function Products({ auth, products }) {
                     {products.data.map((product) => (
                         <Card key={product.id} className="flex flex-col">
                             <CardHeader>
-                                <CardTitle className="truncate">
-                                    {product.name}
-                                </CardTitle>
-                                <CardDescription className="text-sm text-muted-foreground">
+                                <div className="flex justify-between ">
+                                    <CardTitle className="text-lg font-semibold truncate">
+                                        {product.name}
+                                    </CardTitle>
+                                    <CardContent className="mt-1 text-sm text-blue-600 dark:text-blue-300 font-medium">
+                                        {product.categorie}
+                                    </CardContent>
+                                </div>
+
+                                <CardDescription className="text-sm text-muted-foreground mt-2">
                                     {product.description}
                                 </CardDescription>
                             </CardHeader>
+
                             <CardContent>
                                 <img
                                     src={`/${product.imagePath}`}
                                     alt={product.name}
-                                    className="w-full h-48 object-cover rounded-md border"
+                                    className="w-full h-48 rounded-md border"
                                     loading="lazy"
                                 />
                             </CardContent>
                             <CardFooter className="mt-auto">
-                                <Button className="w-full" variant="default">
+                                <Button
+                                    className="w-full bg-amber-600 hover:bg-amber-600 text-white font-semibold transition-colors duration-200"
+                                    variant="default"
+                                >
                                     Add to cart - ${product.price}
                                 </Button>
                             </CardFooter>

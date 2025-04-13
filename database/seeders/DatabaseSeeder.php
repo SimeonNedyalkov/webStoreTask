@@ -20,11 +20,12 @@ class DatabaseSeeder extends Seeder
             "id"=>"1",
             'name' => 'sami',
             'email' => 'sami@gmail.com',
-            "password"=>bcrypt('159357ww')
+            "password"=>bcrypt('123456ww')
         ]);
         // Producs::factory()->count(30)->create(); 
         $this->call([
-            ProducsSeeder::class
+            CategoriesSeeder::class,
+            ProducsSeeder::class,
         ]);
     }
 }
