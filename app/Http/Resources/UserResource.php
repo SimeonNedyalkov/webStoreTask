@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductsResource extends JsonResource
+class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,13 +17,8 @@ class ProductsResource extends JsonResource
     {
         return [
             "id"=>$this->id,
-            "description"=>$this->description,
             "name"=>$this->name,
-            "price"=>$this->price,
-            "categorie"=>$this->categorie,
-            "imagePath"=>$this->imagePath,
-            'createdBy'=>new UserResource($this->createdBy),
-            'updatedBy'=>new UserResource($this->updatedBy),
+            "email"=>$this->email,
         ];
     }
 }
