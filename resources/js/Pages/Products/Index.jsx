@@ -2,6 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 
 export default function Products({ auth, products }) {
+    console.log(products);
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -17,11 +18,11 @@ export default function Products({ auth, products }) {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            {
-                                <pre>
-                                    {JSON.stringify(products, undefined, 2)}
-                                </pre>
-                            }
+                            {products.data.map((product) => {
+                                return (
+                                    <div key={product.id}>{product.name}</div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'sami@gmail.com',
             "password"=>bcrypt('159357ww')
         ]);
-        Producs::factory()->count(30)->create(); 
+        // Producs::factory()->count(30)->create(); 
+        $this->call([
+            ProducsSeeder::class
+        ]);
     }
 }
