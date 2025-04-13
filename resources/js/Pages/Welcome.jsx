@@ -11,7 +11,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <header className="border-b border-gray-200 dark:border-gray-700">
                         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                             <div className="text-2xl font-bold text-red-600">
-                                MyStore
+                                webStoreTask
                             </div>
                             <Navigation auth={auth} />
                         </div>
