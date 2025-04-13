@@ -9,8 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "../../Components/ui/label";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -31,64 +30,51 @@ export default function Products({ auth, products }) {
             }
         >
             <Head title="Products" />
-            <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="framework">Categories</Label>
-                <Select>
-                    <SelectTrigger id="framework">
-                        <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                        <SelectItem value="next">T-shirts</SelectItem>
-                        <SelectItem value="sveltekit">Shoes</SelectItem>
-                        <SelectItem value="astro">Jackets</SelectItem>
-                        <SelectItem value="nuxt">Gloves</SelectItem>
-                    </SelectContent>
-                </Select>
+
+            {/* Select Dropdown with spacing */}
+            <div className="py-6 px-6 max-w-7xl mx-auto">
+                <div className="flex flex-col space-y-2 w-60">
+                    <Label htmlFor="categories">Categories</Label>
+                    <Select>
+                        <SelectTrigger id="categories">
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="tshirts">T-shirts</SelectItem>
+                            <SelectItem value="shoes">Shoes</SelectItem>
+                            <SelectItem value="jackets">Jackets</SelectItem>
+                            <SelectItem value="gloves">Gloves</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            {products.data.map((product) => {
-                                return (
-                                    <Card
-                                        className="w-[350px]"
-                                        key={product.id}
-                                    >
-                                        <CardHeader>
-                                            <CardTitle>
-                                                {product.name}
-                                            </CardTitle>
-                                            <CardDescription>
-                                                {product.description}
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <form>
-                                                <div className="grid w-full items-center gap-4">
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <img
-                                                            src={
-                                                                product.imageUrl
-                                                            }
-                                                            alt={product.name}
-                                                            className="w-full h-48 object-cover rounded-t-lg"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </CardContent>
-                                        <CardFooter className="flex justify-between">
-                                            <Button variant="outline">
-                                                Cancel
-                                            </Button>
-                                            <Button>Deploy</Button>
-                                        </CardFooter>
-                                    </Card>
-                                );
-                            })}
-                        </div>
-                    </div>
+
+            {/* Grid of Products */}
+            <div className="py-6 px-6 max-w-7xl mx-auto">
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+                    {products.data.map((product) => (
+                        <Card key={product.id} className="flex flex-col">
+                            <CardHeader>
+                                <CardTitle>{product.name}</CardTitle>
+                                <CardDescription>
+                                    {product.description}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <img
+                                    src={`http://127.0.0.1:8000/${product.imagePath}`}
+                                    alt={product.name}
+                                    height="5px"
+                                    width="5px"
+                                    className="w-full h-48"
+                                />
+                            </CardContent>
+                            <CardFooter className="flex justify-between">
+                                <Button variant="outline">Cancel</Button>
+                                <Button>Buy</Button>
+                            </CardFooter>
+                        </Card>
+                    ))}
                 </div>
             </div>
         </AuthenticatedLayout>
