@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -58,11 +58,13 @@ export default function Products({ auth, products }) {
                             <CardHeader>
                                 <div className="flex justify-between ">
                                     <CardTitle className="text-lg font-semibold truncate">
-                                        {product.name}
+                                        <Link to={`products/${product.id}`}>
+                                            {product.name}
+                                        </Link>
                                     </CardTitle>
-                                    <CardContent className="mt-1 text-sm text-blue-600 dark:text-blue-300 font-medium">
+                                    {/* <CardContent className="mt-1 text-sm text-blue-600 dark:text-blue-300 font-medium">
                                         {product.categorie}
-                                    </CardContent>
+                                    </CardContent> */}
                                 </div>
 
                                 <CardDescription className="text-sm text-muted-foreground mt-2">

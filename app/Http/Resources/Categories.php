@@ -20,6 +20,6 @@ class Categories extends JsonResource
             "name"=>$this->name,
             'createdBy'=>new UserResource($this->createdBy),
             'updatedBy'=>new UserResource($this->updatedBy),
-        ]
+        ];
     }
 }
