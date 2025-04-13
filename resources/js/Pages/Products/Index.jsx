@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 
 export default function Products({ auth, products }) {
-    console.log(products);
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -31,10 +30,12 @@ export default function Products({ auth, products }) {
         >
             <Head title="Products" />
 
-            {/* Select Dropdown with spacing */}
+            {/* Category Selector */}
             <div className="py-6 px-6 max-w-7xl mx-auto">
-                <div className="flex flex-col space-y-2 w-60">
-                    <Label htmlFor="categories">Categories</Label>
+                <div className="w-full max-w-xs">
+                    <Label htmlFor="categories" className="mb-2 block">
+                        Filter by Category
+                    </Label>
                     <Select>
                         <SelectTrigger id="categories">
                             <SelectValue placeholder="Select a category" />
@@ -49,29 +50,31 @@ export default function Products({ auth, products }) {
                 </div>
             </div>
 
-            {/* Grid of Products */}
+            {/* Products Grid */}
             <div className="py-6 px-6 max-w-7xl mx-auto">
-                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {products.data.map((product) => (
                         <Card key={product.id} className="flex flex-col">
                             <CardHeader>
-                                <CardTitle>{product.name}</CardTitle>
-                                <CardDescription>
+                                <CardTitle className="truncate">
+                                    {product.name}
+                                </CardTitle>
+                                <CardDescription className="text-sm text-muted-foreground">
                                     {product.description}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <img
-                                    src={`http://127.0.0.1:8000/${product.imagePath}`}
+                                    src={`/${product.imagePath}`}
                                     alt={product.name}
-                                    height="5px"
-                                    width="5px"
-                                    className="w-full h-48"
+                                    className="w-full h-48 object-cover rounded-md border"
+                                    loading="lazy"
                                 />
                             </CardContent>
-                            <CardFooter className="flex justify-between">
-                                <Button variant="outline">Cancel</Button>
-                                <Button>Buy</Button>
+                            <CardFooter className="mt-auto">
+                                <Button className="w-full" variant="default">
+                                    Add to cart - ${product.price}
+                                </Button>
                             </CardFooter>
                         </Card>
                     ))}
