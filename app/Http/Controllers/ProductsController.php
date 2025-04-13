@@ -14,7 +14,7 @@ class ProductsController extends Controller
     public function index()
     {
         $query = Producs::query();
-        $products = $query->paginate(10)->onEachPage(1);
+        $products = $query->paginate(10)->onEachSide(1);
         return inertia('Products/Index',[]);
     }
 
