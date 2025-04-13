@@ -21,7 +21,7 @@ class ProducsSeeder extends Seeder
                 'categorie' => 'Clothing',
                 'created_by' => 1,
                 'updated_by' => 1,
-                'imagePath' => 'products/red-tshirt.jpg',
+                'imagePath' => 'https://static.vecteezy.com/system/resources/previews/021/104/647/non_2x/red-t-shirt-free-png.png',
             ],
             [
                 'name' => 'Blue Jeans',
