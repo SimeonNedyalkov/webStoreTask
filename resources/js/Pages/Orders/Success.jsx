@@ -89,7 +89,9 @@ export default function Success({ auth, order }) {
                                 </div>
 
                                 <div className="flex justify-center">
-                                    <Link href={route("products.index")}>
+                                    <Link
+                                        href={route("dashboard.products.index")}
+                                    >
                                         <Button>Continue Shopping</Button>
                                     </Link>
                                 </div>

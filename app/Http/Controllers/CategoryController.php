@@ -6,6 +6,7 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -54,6 +55,8 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
+        $category->loadMissing(['createdBy', 'updatedBy']);
+        
         return Inertia::render('Categories/Edit', [
             'category' => new CategoryResource($category)
         ]);

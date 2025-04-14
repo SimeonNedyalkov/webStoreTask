@@ -4,6 +4,7 @@ import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
+import Cart from "@/Components/Cart";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -31,14 +32,18 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    href={route("products.index")}
-                                    active={route().current("products.index")}
+                                    href={route("dashboard.products.index")}
+                                    active={route().current(
+                                        "dashboard.products.index"
+                                    )}
                                 >
                                     Products
                                 </NavLink>
                                 <NavLink
-                                    href={route("categories.index")}
-                                    active={route().current("categories.index")}
+                                    href={route("dashboard.categories.index")}
+                                    active={route().current(
+                                        "dashboard.categories.index"
+                                    )}
                                 >
                                     Categories
                                 </NavLink>
@@ -46,6 +51,9 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                            <div className="relative ms-3">
+                                <Cart />
+                            </div>
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>

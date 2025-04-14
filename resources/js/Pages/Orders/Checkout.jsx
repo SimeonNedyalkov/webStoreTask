@@ -1,40 +1,71 @@
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { useCart } from "@/Contexts/CartContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Checkout({ auth, errors: serverErrors }) {
-    const { cart, total, clearCart } = useCart();
-    const { data, setData, post, processing, errors, reset } = useForm({
-        customer_name: "",
-        customer_email: "",
-        customer_phone: "",
-        customer_address: "",
-    });
+    const { cart, total, clearCart, isInitialized } = useCart();
+    const user = usePage().props.auth.user;
+    const { data, setData, post, processing, errors, reset, setError } =
+        useForm({
+            customer_name: "",
+            customer_email: "",
+            customer_phone: "",
+            customer_address: "",
+            cart: [],
+        });
 
     useEffect(() => {
         if (serverErrors) {
             console.error("Server errors:", serverErrors);
+            Object.keys(serverErrors).forEach((key) => {
+                setError(key, serverErrors[key]);
+            });
         }
     }, [serverErrors]);
 
+    useEffect(() => {
+        if (cart && cart.length > 0) {
+            setData(
+                "cart",
+                cart.map((item) => ({
+                    id: item.id,
+                    quantity: parseInt(item.quantity),
+                    price: parseFloat(item.price),
+                }))
+            );
+        }
+    }, [cart]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Submitting form with data:", data);
-        console.log("Cart contents:", cart);
+
+        if (!cart || cart.length === 0) {
+            setError("cart", "Cart is empty");
+            return;
+        }
+
+        console.log("Submitting order with data:", {
+            ...data,
+            cart: cart.map((item) => ({
+                id: item.id,
+                quantity: parseInt(item.quantity),
+                price: parseFloat(item.price),
+            })),
+        });
 
         post(
-            route("orders.store"),
+            route("dashboard.users.orders.store", user.id),
             {
                 ...data,
                 cart: cart.map((item) => ({
                     id: item.id,
-                    quantity: item.quantity,
-                    price: item.price,
+                    quantity: parseInt(item.quantity),
+                    price: parseFloat(item.price),
                 })),
             },
             {
@@ -44,7 +75,11 @@ export default function Checkout({ auth, errors: serverErrors }) {
                 },
                 onError: (errors) => {
                     console.error("Order submission failed:", errors);
+                    Object.keys(errors).forEach((key) => {
+                        setError(key, errors[key]);
+                    });
                 },
+                preserveScroll: true,
             }
         );
     };

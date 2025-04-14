@@ -52,8 +52,8 @@ class ProductsController extends Controller
             $validated['image_path'] = $path;
         }
 
-        $validated['created_by'] = auth()->id();
-        $validated['updated_by'] = auth()->id();
+        $validated['created_by'] = $request->user()->id;
+        $validated['updated_by'] = $request->user()->id;
 
         $product = Product::create($validated);
 
@@ -63,6 +63,7 @@ class ProductsController extends Controller
 
     public function edit(Product $product)
     {
+        $product->load(['category', 'createdBy', 'updatedBy']);
         return Inertia::render('Products/Edit', [
             'product' => new ProductsResource($product),
             'categories' => Category::all()
@@ -89,7 +90,7 @@ class ProductsController extends Controller
             $validated['image_path'] = $path;
         }
 
-        $validated['updated_by'] = auth()->id();
+        $validated['updated_by'] = $request->user()->id;
 
         $product->update($validated);
 

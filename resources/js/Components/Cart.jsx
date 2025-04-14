@@ -6,14 +6,16 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
+    SheetDescription,
     SheetTrigger,
 } from "@/Components/ui/sheet";
 import { ShoppingCart, X, Plus, Minus } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 
 export default function Cart() {
     const { cart, total, removeFromCart, updateQuantity } = useCart();
     const [isOpen, setIsOpen] = useState(false);
+    const user = usePage().props.auth.user;
 
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -30,6 +32,9 @@ export default function Cart() {
             <SheetContent>
                 <SheetHeader>
                     <SheetTitle>Shopping Cart</SheetTitle>
+                    <SheetDescription>
+                        View and manage your shopping cart items
+                    </SheetDescription>
                 </SheetHeader>
 
                 <div className="mt-6">
@@ -111,7 +116,10 @@ export default function Cart() {
                                     </span>
                                 </div>
                                 <Link
-                                    href={route("orders.checkout")}
+                                    href={route(
+                                        "dashboard.users.checkout",
+                                        user.id
+                                    )}
                                     className="w-full"
                                 >
                                     <Button className="w-full">Checkout</Button>

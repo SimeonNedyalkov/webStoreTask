@@ -7,18 +7,17 @@ import TextInput from "@/Components/TextInput";
 import TextArea from "@/Components/TextArea";
 
 export default function Edit({ auth, product, categories }) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         name: product.name,
         description: product.description,
         price: product.price,
         category_id: product.category_id,
         image: null,
-        _method: "PUT",
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route("products.update", product.id));
+        put(route("products.update", product.id));
     };
 
     return (

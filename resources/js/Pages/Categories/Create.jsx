@@ -14,7 +14,7 @@ export default function Create({ auth }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route("categories.store"));
+        post(route("dashboard.categories.store"));
     };
 
     return (

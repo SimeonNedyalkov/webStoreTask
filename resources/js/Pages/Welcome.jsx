@@ -1,7 +1,19 @@
 import { Head, Link } from "@inertiajs/react";
 import Navigation from "./Navigation";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+export default function Welcome({
+    auth,
+    laravelVersion,
+    phpVersion,
+    products,
+}) {
     return (
         <>
             <Head title="Welcome to Our Store" />
@@ -41,83 +53,44 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     >
                         <div className="max-w-7xl mx-auto px-6">
                             <h2 className="text-3xl font-semibold mb-10 text-center">
-                                Featured Products
+                                Our Products
                             </h2>
-                            <div className="grid gap-8 grid-cols-1 md:grid-cols-3">
-                                {/* Product 1 */}
-                                <div className="border rounded-2xl overflow-hidden shadow hover:shadow-lg transition bg-white dark:bg-gray-800">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1585386959984-a4155224a1a7"
-                                        alt="Vintage Camera"
-                                        className="w-full h-64 object-cover"
-                                    />
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold">
-                                            Vintage Camera
-                                        </h3>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Capture timeless moments in style.
-                                        </p>
-                                        <div className="mt-4 flex justify-between items-center">
-                                            <span className="text-lg font-bold text-red-600">
-                                                $120
-                                            </span>
-                                            <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition">
-                                                Buy Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Product 2 */}
-                                <div className="border rounded-2xl overflow-hidden shadow hover:shadow-lg transition bg-white dark:bg-gray-800">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1606813909027-cc3c5c202dc0"
-                                        alt="Stylish Headphones"
-                                        className="w-full h-64 object-cover"
-                                    />
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold">
-                                            Stylish Headphones
-                                        </h3>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Immerse in premium sound quality.
-                                        </p>
-                                        <div className="mt-4 flex justify-between items-center">
-                                            <span className="text-lg font-bold text-red-600">
-                                                $89
-                                            </span>
-                                            <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition">
-                                                Buy Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Product 3 */}
-                                <div className="border rounded-2xl overflow-hidden shadow hover:shadow-lg transition bg-white dark:bg-gray-800">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1610465292132-9b3c1b8b5414"
-                                        alt="Minimalist Watch"
-                                        className="w-full h-64 object-cover"
-                                    />
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold">
-                                            Minimalist Watch
-                                        </h3>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Elegance meets functionality.
-                                        </p>
-                                        <div className="mt-4 flex justify-between items-center">
-                                            <span className="text-lg font-bold text-red-600">
-                                                $199
-                                            </span>
-                                            <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition">
-                                                Buy Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {products &&
+                                    products.map((product) => (
+                                        <Card
+                                            key={product.id}
+                                            className="flex flex-col"
+                                        >
+                                            {product.image_path && (
+                                                <div className="relative h-48 w-full">
+                                                    <img
+                                                        src={`/storage/${product.image_path}`}
+                                                        alt={product.name}
+                                                        className="absolute inset-0 h-full w-full rounded-t-lg"
+                                                    />
+                                                </div>
+                                            )}
+                                            <CardHeader>
+                                                <CardTitle>
+                                                    {product.name}
+                                                </CardTitle>
+                                                <CardDescription>
+                                                    {product.category
+                                                        ? product.category.name
+                                                        : "No Category"}
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="flex-grow">
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                                    {product.description}
+                                                </p>
+                                                <p className="text-lg font-semibold text-red-600 dark:text-red-400">
+                                                    ${product.price}
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
                             </div>
                         </div>
                     </section>

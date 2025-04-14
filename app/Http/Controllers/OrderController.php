@@ -7,119 +7,119 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class OrderController extends Controller
 {
-    public function checkout()
+    public function checkout($user)
     {
-        return Inertia::render('Orders/Checkout');
+        return Inertia::render('Orders/Checkout', [
+            'user' => $user
+        ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $user)
     {
         try {
-            Log::info('Order submission started', ['request' => $request->all()]);
+            Log::info('Order submission started', ['request' => $request->all(), 'user' => $user]);
 
-            $request->validate([
+            if (!$request->has('cart') || !is_array($request->cart) || empty($request->cart)) {
+                throw ValidationException::withMessages([
+                    'cart' => ['The cart field is required and must not be empty.']
+                ]);
+            }
+
+            $validated = $request->validate([
                 'customer_name' => 'required|string|max:255',
                 'customer_email' => 'required|email|max:255',
                 'customer_phone' => 'required|string|max:20',
-                'customer_address' => 'required|string',
-                'cart' => 'required|array',
+                'customer_address' => 'required|string|max:500',
+                'cart' => 'required|array|min:1',
                 'cart.*.id' => 'required|exists:products,id',
                 'cart.*.quantity' => 'required|integer|min:1',
                 'cart.*.price' => 'required|numeric|min:0',
             ]);
 
-            $cart = $request->cart;
-            Log::info('Cart contents', ['cart' => $cart]);
-            
-            if (empty($cart)) {
-                Log::warning('Empty cart attempted checkout');
-                return redirect()->back()->with('error', 'Your cart is empty');
-            }
+            Log::info('Order validation passed', ['validated' => $validated]);
 
-            $totalAmount = 0;
-            foreach ($cart as $item) {
-                $totalAmount += $item['price'] * $item['quantity'];
-            }
+            // Calculate total amount
+            $totalAmount = collect($validated['cart'])->sum(function ($item) {
+                return $item['quantity'] * $item['price'];
+            });
 
-            Log::info('Creating order', [
-                'total_amount' => $totalAmount,
-                'customer_name' => $request->customer_name
-            ]);
+            Log::info('Total amount calculated', ['total' => $totalAmount]);
 
             // Create order
             $order = Order::create([
-                'customer_name' => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
-                'customer_address' => $request->customer_address,
+                'user_id' => $user,
+                'customer_name' => $validated['customer_name'],
+                'customer_email' => $validated['customer_email'],
+                'customer_phone' => $validated['customer_phone'],
+                'customer_address' => $validated['customer_address'],
                 'total_amount' => $totalAmount,
                 'status' => 'pending',
             ]);
 
-            Log::info('Order created', ['order_id' => $order->id]);
+            Log::info('Order created', ['order' => $order->toArray()]);
 
             // Create order items
-            foreach ($cart as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
+            foreach ($validated['cart'] as $item) {
+                $order->items()->create([
                     'product_id' => $item['id'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
                 ]);
             }
 
-            Log::info('Order items created');
+            Log::info('Order items created', ['items' => $order->items->toArray()]);
 
-            // Save order details to a file
-            $orderData = [
-                'order_id' => $order->id,
-                'customer_name' => $order->customer_name,
-                'customer_email' => $order->customer_email,
-                'customer_phone' => $order->customer_phone,
-                'customer_address' => $order->customer_address,
-                'total_amount' => $order->total_amount,
-                'items' => $order->items()->with('product')->get()->map(function ($item) {
-                    return [
-                        'product_name' => $item->product->name,
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
-                        'subtotal' => $item->quantity * $item->price,
-                    ];
-                }),
-                'created_at' => $order->created_at,
+            // Save order details to file
+            $orderDetails = [
+                'order' => $order->toArray(),
+                'items' => $order->items->toArray(),
+                'timestamp' => now()->toIso8601String(),
             ];
 
-            // Ensure the orders directory exists
-            Storage::makeDirectory('public/orders');
+            $filename = 'order_' . $order->id . '_' . time() . '.json';
+            $path = storage_path('app/public/orders/' . $filename);
+            
+            if (!file_exists(storage_path('app/public/orders'))) {
+                mkdir(storage_path('app/public/orders'), 0755, true);
+            }
 
-            // Save order details to a JSON file
-            Storage::put(
-                "public/orders/order_{$order->id}.json",
-                json_encode($orderData, JSON_PRETTY_PRINT)
-            );
+            file_put_contents($path, json_encode($orderDetails, JSON_PRETTY_PRINT));
+            Log::info('Order details saved to file', ['path' => $path]);
 
-            Log::info('Order file saved');
+            return redirect()->route('dashboard.users.orders.success', ['user' => $user, 'order' => $order])
+                ->with('success', 'Order placed successfully!');
 
-            Log::info('Order process completed successfully');
-
-            return redirect()->route('orders.success', $order)->with('success', 'Order placed successfully!');
-        } catch (\Exception $e) {
-            Log::error('Order processing failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+        } catch (ValidationException $e) {
+            Log::error('Order validation failed', [
+                'errors' => $e->errors(),
+                'request' => $request->all()
             ]);
-            return redirect()->back()->with('error', 'An error occurred while processing your order. Please try again.');
+
+            return back()->withErrors($e->errors())
+                ->withInput();
+
+        } catch (\Exception $e) {
+            Log::error('Order submission failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+
+            return back()->withErrors(['error' => 'Failed to place order. Please try again.'])
+                ->withInput();
         }
     }
 
-    public function success(Order $order)
+    public function success($user, Order $order)
     {
         return Inertia::render('Orders/Success', [
-            'order' => $order->load('items.product')
+            'order' => $order->load('items.product'),
+            'user' => $user
         ]);
     }
 } 

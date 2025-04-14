@@ -14,21 +14,22 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'products' => \App\Http\Resources\ProductsResource::collection(\App\Models\Product::with('category')->get())->resolve()
     ]);
 });
 
+Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
 
 Route::middleware(['auth','verified'])->group(function(){
     Route::get('/dashboard', fn()=>Inertia::render('Dashboard'))->name('dashboard');
-    Route::resource('categories', CategoryController::class);
-    Route::prefix('dashboard')->group(function() {
+    Route::prefix('dashboard')->name('dashboard.')->group(function() {
+        Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductsController::class);
-        Route::get('checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
-        Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
-        Route::get('orders/{order}/success', [OrderController::class, 'success'])->name('orders.success');
+        Route::get('users/{user}/checkout', [OrderController::class, 'checkout'])->name('users.checkout');
+        Route::post('users/{user}/orders', [OrderController::class, 'store'])->name('users.orders.store');
+        Route::get('users/{user}/orders/{order}/success', [OrderController::class, 'success'])->name('users.orders.success');
     });
 });
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

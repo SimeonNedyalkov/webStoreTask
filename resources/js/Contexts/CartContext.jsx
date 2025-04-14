@@ -1,30 +1,50 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-const CartContext = createContext();
+const CartContext = createContext({
+    cart: [],
+    total: 0,
+    addToCart: () => {},
+    removeFromCart: () => {},
+    updateQuantity: () => {},
+    clearCart: () => {},
+    itemCount: 0,
+});
 
 export function CartProvider({ children }) {
     const [cart, setCart] = useState([]);
     const [total, setTotal] = useState(0);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // Load cart from localStorage on initial render
     useEffect(() => {
-        const savedCart = localStorage.getItem("cart");
-        if (savedCart) {
-            setCart(JSON.parse(savedCart));
+        try {
+            const savedCart = localStorage.getItem("cart");
+            if (savedCart) {
+                setCart(JSON.parse(savedCart));
+            }
+            setIsInitialized(true);
+        } catch (error) {
+            console.error("Error loading cart from localStorage:", error);
+            setIsInitialized(true);
         }
     }, []);
 
     // Save cart to localStorage whenever it changes
     useEffect(() => {
-        localStorage.setItem("cart", JSON.stringify(cart));
-
-        // Calculate total
-        const newTotal = cart.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-        );
-        setTotal(newTotal);
-    }, [cart]);
+        if (isInitialized) {
+            try {
+                localStorage.setItem("cart", JSON.stringify(cart));
+                // Calculate total
+                const newTotal = cart.reduce(
+                    (sum, item) => sum + item.price * item.quantity,
+                    0
+                );
+                setTotal(newTotal);
+            } catch (error) {
+                console.error("Error saving cart to localStorage:", error);
+            }
+        }
+    }, [cart, isInitialized]);
 
     const addToCart = (product) => {
         setCart((prevCart) => {
@@ -66,20 +86,19 @@ export function CartProvider({ children }) {
         setCart([]);
     };
 
+    const value = {
+        cart,
+        total,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        itemCount: cart.reduce((sum, item) => sum + item.quantity, 0),
+        isInitialized,
+    };
+
     return (
-        <CartContext.Provider
-            value={{
-                cart,
-                total,
-                addToCart,
-                removeFromCart,
-                updateQuantity,
-                clearCart,
-                itemCount: cart.reduce((sum, item) => sum + item.quantity, 0),
-            }}
-        >
-            {children}
-        </CartContext.Provider>
+        <CartContext.Provider value={value}>{children}</CartContext.Provider>
     );
 }
 

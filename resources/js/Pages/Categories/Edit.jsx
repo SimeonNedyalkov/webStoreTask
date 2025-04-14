@@ -14,7 +14,7 @@ export default function Edit({ auth, category }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route("categories.update", category.id));
+        put(route("dashboard.categories.update", category.id));
     };
 
     return (
@@ -32,6 +32,50 @@ export default function Edit({ auth, category }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
+                            <div className="mb-6">
+                                <h3 className="text-lg font-medium text-gray-900">
+                                    Category Details
+                                </h3>
+                                <div className="mt-2 text-sm text-gray-500">
+                                    <p>
+                                        Created by:{" "}
+                                        {category.created_by || "Unknown"}
+                                    </p>
+                                    <p>
+                                        Last updated by:{" "}
+                                        {category.updated_by || "Unknown"}
+                                    </p>
+                                    <p>
+                                        Created at:{" "}
+                                        {category.created_at
+                                            ? new Date(
+                                                  category.created_at
+                                              ).toLocaleDateString("en-US", {
+                                                  year: "numeric",
+                                                  month: "long",
+                                                  day: "numeric",
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                              })
+                                            : "Unknown"}
+                                    </p>
+                                    <p>
+                                        Last updated:{" "}
+                                        {category.updated_at
+                                            ? new Date(
+                                                  category.updated_at
+                                              ).toLocaleDateString("en-US", {
+                                                  year: "numeric",
+                                                  month: "long",
+                                                  day: "numeric",
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                              })
+                                            : "Unknown"}
+                                    </p>
+                                </div>
+                            </div>
+
                             <form onSubmit={submit}>
                                 <div className="mb-4">
                                     <InputLabel htmlFor="name" value="Name" />

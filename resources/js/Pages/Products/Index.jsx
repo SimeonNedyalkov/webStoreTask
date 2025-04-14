@@ -29,7 +29,7 @@ export default function Index({ auth, products, categories, filters }) {
     const handleDelete = (id) => {
         if (confirm("Are you sure you want to delete this product?")) {
             setProcessing(true);
-            router.delete(route("products.destroy", id), {
+            router.delete(route("dashboard.products.destroy", id), {
                 onFinish: () => setProcessing(false),
             });
         }
@@ -39,7 +39,7 @@ export default function Index({ auth, products, categories, filters }) {
         // If "all" is selected, don't send category_id parameter
         const params = value === "all" ? {} : { category_id: value };
 
-        router.get(route("products.index"), params, {
+        router.get(route("dashboard.products.index"), params, {
             preserveState: true,
             preserveScroll: true,
         });
@@ -53,7 +53,7 @@ export default function Index({ auth, products, categories, filters }) {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Products
                     </h2>
-                    <Cart />
+                    {/* <Cart /> */}
                 </div>
             }
         >
@@ -92,7 +92,9 @@ export default function Index({ auth, products, categories, filters }) {
                                 </div>
                                 <Button
                                     onClick={() =>
-                                        router.visit(route("products.create"))
+                                        router.visit(
+                                            route("dashboard.products.create")
+                                        )
                                     }
                                     className="bg-blue-500 hover:bg-blue-600"
                                 >
@@ -144,7 +146,7 @@ export default function Index({ auth, products, categories, filters }) {
                                                     <ShoppingCart className="w-4 h-4 mr-2" />
                                                     Add to Cart
                                                 </Button>
-                                                <Button
+                                                {/* <Button
                                                     variant="outline"
                                                     className="flex-1"
                                                     onClick={() =>
@@ -157,7 +159,7 @@ export default function Index({ auth, products, categories, filters }) {
                                                     }
                                                 >
                                                     View
-                                                </Button>
+                                                </Button> */}
                                             </div>
                                             <div className="flex justify-between w-full">
                                                 <Button
@@ -166,7 +168,7 @@ export default function Index({ auth, products, categories, filters }) {
                                                     onClick={() =>
                                                         router.visit(
                                                             route(
-                                                                "products.edit",
+                                                                "dashboard.products.edit",
                                                                 product.id
                                                             )
                                                         )

@@ -9,7 +9,7 @@ export default function Index({ auth, categories }) {
     const handleDelete = (id) => {
         if (confirm("Are you sure you want to delete this category?")) {
             setProcessing(true);
-            router.delete(route("categories.destroy", id), {
+            router.delete(route("dashboard.categories.destroy", id), {
                 onFinish: () => setProcessing(false),
             });
         }
@@ -35,7 +35,7 @@ export default function Index({ auth, categories }) {
                                     Category List
                                 </h3>
                                 <a
-                                    href={route("categories.create")}
+                                    href={route("dashboard.categories.create")}
                                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
                                 >
                                     Add Category
@@ -77,7 +77,7 @@ export default function Index({ auth, categories }) {
                                                 <td className="px-6 py-4 border-b text-right">
                                                     <a
                                                         href={route(
-                                                            "categories.edit",
+                                                            "dashboard.categories.edit",
                                                             category.id
                                                         )}
                                                         className="text-blue-600 hover:text-blue-800 mr-4"
