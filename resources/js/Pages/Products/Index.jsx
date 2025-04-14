@@ -106,12 +106,12 @@ export default function Index({ auth, products, categories, filters }) {
                                         key={product.id}
                                         className="flex flex-col"
                                     >
-                                        {product.image && (
+                                        {product.image_path && (
                                             <div className="relative h-48 w-full">
                                                 <img
-                                                    src={product.image}
+                                                    src={`/storage/${product.image_path}`}
                                                     alt={product.name}
-                                                    className="absolute inset-0 h-full w-full object-cover rounded-t-lg"
+                                                    className="absolute inset-0 h-full w-full rounded-t-lg"
                                                 />
                                             </div>
                                         )}
@@ -134,18 +134,35 @@ export default function Index({ auth, products, categories, filters }) {
                                             </p>
                                         </CardContent>
                                         <CardFooter className="flex flex-col gap-2">
-                                            <Button
-                                                className="w-full bg-blue-500 hover:bg-blue-600"
-                                                onClick={() =>
-                                                    addToCart(product)
-                                                }
-                                            >
-                                                <ShoppingCart className="w-4 h-4 mr-2" />
-                                                Add to Cart
-                                            </Button>
+                                            <div className="flex justify-between w-full gap-2">
+                                                <Button
+                                                    className="flex-1 bg-blue-500 hover:bg-blue-600"
+                                                    onClick={() =>
+                                                        addToCart(product)
+                                                    }
+                                                >
+                                                    <ShoppingCart className="w-4 h-4 mr-2" />
+                                                    Add to Cart
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    className="flex-1"
+                                                    onClick={() =>
+                                                        router.visit(
+                                                            route(
+                                                                "products.show",
+                                                                product.id
+                                                            )
+                                                        )
+                                                    }
+                                                >
+                                                    View
+                                                </Button>
+                                            </div>
                                             <div className="flex justify-between w-full">
                                                 <Button
                                                     variant="outline"
+                                                    className="flex-1"
                                                     onClick={() =>
                                                         router.visit(
                                                             route(
@@ -158,7 +175,8 @@ export default function Index({ auth, products, categories, filters }) {
                                                     Edit
                                                 </Button>
                                                 <Button
-                                                    variant="destructive"
+                                                    variant="outline"
+                                                    className="flex-1 ml-2"
                                                     onClick={() =>
                                                         handleDelete(product.id)
                                                     }

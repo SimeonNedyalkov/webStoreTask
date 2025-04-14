@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,6 +23,9 @@ Route::middleware(['auth','verified'])->group(function(){
     Route::resource('categories', CategoryController::class);
     Route::prefix('dashboard')->group(function() {
         Route::resource('products', ProductsController::class);
+        Route::get('checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
+        Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
+        Route::get('orders/{order}/success', [OrderController::class, 'success'])->name('orders.success');
     });
 });
 

@@ -3,36 +3,29 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::first();
-
         $categories = [
             [
-                'name' => 'Electronics',
-                'description' => 'Electronic devices and accessories',
-            ],
-            [
                 'name' => 'Clothing',
-                'description' => 'Fashion items and accessories',
+                'description' => 'All types of clothing items',
+                'created_by' => 1,
+                'updated_by' => 1,
             ],
             [
-                'name' => 'Books',
-                'description' => 'Books and educational materials',
+                'name' => 'Footwear',
+                'description' => 'All types of shoes and footwear',
+                'created_by' => 1,
+                'updated_by' => 1,
             ],
         ];
 
         foreach ($categories as $category) {
-            Category::create([
-                ...$category,
-                'created_by' => $admin->id,
-                'updated_by' => $admin->id,
-            ]);
+            Category::create($category);
         }
     }
 } 

@@ -3,9 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
-use App\Models\Products;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class ProductsSeeder extends Seeder
 {
@@ -14,6 +16,43 @@ class ProductsSeeder extends Seeder
      */
     public function run(): void
     {
+        // Ensure the storage directory exists
+        if (!Storage::disk('public')->exists('products')) {
+            Storage::disk('public')->makeDirectory('products');
+        }
+
+        // Copy seed images to storage
+        $seedImagesPath = database_path('seeders/images/products');
+        $files = [
+            'red-t-shirt-free-png.webp',
+            'T-shirts__Ts007_Suitsupply_Online_Store_1.jpg',
+            'R.png',
+            'OIP.jfif'
+        ];
+
+        foreach ($files as $file) {
+            $sourcePath = $seedImagesPath . '/' . $file;
+            $targetPath = 'products/' . $file;
+            
+            Log::info('Copying image', [
+                'source' => $sourcePath,
+                'target' => $targetPath,
+                'exists' => File::exists($sourcePath)
+            ]);
+
+            if (File::exists($sourcePath)) {
+                $contents = File::get($sourcePath);
+                Storage::disk('public')->put($targetPath, $contents);
+                
+                Log::info('Image copied successfully', [
+                    'file' => $file,
+                    'stored' => Storage::disk('public')->exists($targetPath)
+                ]);
+            } else {
+                Log::error('Image file not found', ['file' => $file]);
+            }
+        }
+
         $products = [
             [
                 'name' => 'Red T-Shirt',
@@ -22,7 +61,7 @@ class ProductsSeeder extends Seeder
                 'category_id' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
-                'imagePath' => 'products/red-t-shirt-free-png.webp',
+                'image_path' => 'products/red-t-shirt-free-png.webp',
             ],
             [
                 'name' => 'Black T-Shirt',
@@ -31,7 +70,7 @@ class ProductsSeeder extends Seeder
                 'category_id' => 1,
                 'created_by' => 1,
                 'updated_by' => 1,
-                'imagePath' => 'products/T-shirts__Ts007_Suitsupply_Online_Store_1.jpg',
+                'image_path' => 'products/T-shirts__Ts007_Suitsupply_Online_Store_1.jpg',
             ],
             [
                 'name' => 'Orange Shoes',
@@ -40,9 +79,8 @@ class ProductsSeeder extends Seeder
                 'category_id' => 2,
                 'created_by' => 1,
                 'updated_by' => 1,
-                'imagePath' => 'products/R.png',
+                'image_path' => 'products/R.png',
             ],
-           
             [
                 'name' => 'Blue Pink Shoes',
                 'description' => 'Trendy blue and pink shoes combining style and comfort.',
@@ -50,7 +88,7 @@ class ProductsSeeder extends Seeder
                 'category_id' => 2,
                 'created_by' => 1,
                 'updated_by' => 1,
-                'imagePath' => 'products/OIP.jfif',
+                'image_path' => 'products/OIP.jfif',
             ],
             // [
             //     'name' => 'Notebook',

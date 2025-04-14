@@ -9,6 +9,7 @@ import {
     SheetTrigger,
 } from "@/Components/ui/sheet";
 import { ShoppingCart, X, Plus, Minus } from "lucide-react";
+import { Link } from "@inertiajs/react";
 
 export default function Cart() {
     const { cart, total, removeFromCart, updateQuantity } = useCart();
@@ -109,7 +110,12 @@ export default function Cart() {
                                         ${total.toFixed(2)}
                                     </span>
                                 </div>
-                                <Button className="w-full">Checkout</Button>
+                                <Link
+                                    href={route("orders.checkout")}
+                                    className="w-full"
+                                >
+                                    <Button className="w-full">Checkout</Button>
+                                </Link>
                             </div>
                         </>
                     )}

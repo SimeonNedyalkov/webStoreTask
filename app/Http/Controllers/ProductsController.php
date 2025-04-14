@@ -49,7 +49,7 @@ class ProductsController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
-            $validated['image'] = Storage::url($path);
+            $validated['image_path'] = $path;
         }
 
         $validated['created_by'] = auth()->id();
@@ -81,13 +81,12 @@ class ProductsController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($product->image) {
-                $oldPath = str_replace('/storage/', '', $product->image);
-                Storage::disk('public')->delete($oldPath);
+            if ($product->image_path) {
+                Storage::disk('public')->delete($product->image_path);
             }
             
             $path = $request->file('image')->store('products', 'public');
-            $validated['image'] = Storage::url($path);
+            $validated['image_path'] = $path;
         }
 
         $validated['updated_by'] = auth()->id();
@@ -100,14 +99,22 @@ class ProductsController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->image) {
-            $path = str_replace('/storage/', '', $product->image);
-            Storage::disk('public')->delete($path);
+        if ($product->image_path) {
+            Storage::disk('public')->delete($product->image_path);
         }
 
         $product->delete();
 
         return redirect()->route('products.index')
             ->with('success', 'Product deleted successfully.');
+    }
+
+    public function show(Product $product)
+    {
+        Log::info('Product show called', ['product_id' => $product->id]);
+        
+        return Inertia::render('Products/Show', [
+            'product' => new ProductsResource($product->load(['category', 'createdBy', 'updatedBy']))
+        ]);
     }
 } 

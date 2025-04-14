@@ -157,11 +157,11 @@ export default function Edit({ auth, product, categories }) {
                                     />
                                 </div>
 
-                                {product.image && (
+                                {product.image_path && (
                                     <div>
                                         <InputLabel value="Current Image" />
                                         <img
-                                            src={product.image}
+                                            src={`/storage/${product.image_path}`}
                                             alt={product.name}
                                             className="mt-2 h-32 w-32 object-cover rounded-lg"
                                         />
