@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-Route::redirect('/','/dashboard');
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -15,11 +16,13 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('auth')->group(function(){
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-    Route::resource('dashboard/products',ProductsController::class);
+
+Route::middleware(['auth','verified'])->group(function(){
+    Route::get('/dashboard', fn()=>Inertia::render('Dashboard'))->name('dashboard');
+    Route::resource('categories', CategoryController::class);
+    Route::prefix('dashboard')->group(function() {
+        Route::resource('products', ProductsController::class);
+    });
 });
 
 

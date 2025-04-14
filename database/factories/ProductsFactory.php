@@ -2,15 +2,16 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\User;
-use Database\Seeders\ProducsSeeder;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Producs>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Products>
  */
-class ProducsFactory extends Factory
+class ProductsFactory extends Factory
 {
+    protected $model = Product::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,10 +20,10 @@ class ProducsFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'=>fake()->name(),
-            'description'=>fake()->realText(),
-            'price'=>fake()->randomFloat(2, 10, 500),
-            'categorie'=>fake()->word(),
+            'name' => fake()->word(),
+            'description' => fake()->sentence(),
+            'price' => fake()->randomFloat(2, 1, 1000),
+            'stock' => fake()->numberBetween(0, 100),
             'created_by' => 1,
             'updated_by' => 1,
             'imagePath' => fake()->imageUrl(),

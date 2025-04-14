@@ -1,6 +1,7 @@
+import { Head } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
+import { router } from "@inertiajs/react";
+import { useState } from "react";
 import {
     Card,
     CardContent,
@@ -8,88 +9,183 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+} from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/Components/ui/select";
+import { useCart } from "@/Contexts/CartContext";
+import Cart from "@/Components/Cart";
+import { ShoppingCart } from "lucide-react";
 
-export default function Products({ auth, products }) {
+export default function Index({ auth, products, categories, filters }) {
+    const [processing, setProcessing] = useState(false);
+    const { addToCart } = useCart();
+
+    const handleDelete = (id) => {
+        if (confirm("Are you sure you want to delete this product?")) {
+            setProcessing(true);
+            router.delete(route("products.destroy", id), {
+                onFinish: () => setProcessing(false),
+            });
+        }
+    };
+
+    const handleCategoryChange = (value) => {
+        // If "all" is selected, don't send category_id parameter
+        const params = value === "all" ? {} : { category_id: value };
+
+        router.get(route("products.index"), params, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Products
-                </h2>
+                <div className="flex justify-between items-center">
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Products
+                    </h2>
+                    <Cart />
+                </div>
             }
         >
             <Head title="Products" />
 
-            {/* Category Selector */}
-            <div className="py-6 px-6 max-w-7xl mx-auto">
-                <div className="w-full max-w-xs">
-                    <Label htmlFor="categories" className="mb-2 block">
-                        Filter by Category
-                    </Label>
-                    <Select>
-                        <SelectTrigger id="categories">
-                            <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="tshirts">T-shirts</SelectItem>
-                            <SelectItem value="shoes">Shoes</SelectItem>
-                            <SelectItem value="jackets">Jackets</SelectItem>
-                            <SelectItem value="gloves">Gloves</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-
-            {/* Products Grid */}
-            <div className="py-6 px-6 max-w-7xl mx-auto">
-                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    {products.data.map((product) => (
-                        <Card key={product.id} className="flex flex-col">
-                            <CardHeader>
-                                <div className="flex justify-between ">
-                                    <CardTitle className="text-lg font-semibold truncate">
-                                        <Link to={`products/${product.id}`}>
-                                            {product.name}
-                                        </Link>
-                                    </CardTitle>
-                                    {/* <CardContent className="mt-1 text-sm text-blue-600 dark:text-blue-300 font-medium">
-                                        {product.categorie}
-                                    </CardContent> */}
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6 text-gray-900">
+                            <div className="flex justify-between items-center mb-6">
+                                <div className="flex items-center gap-4">
+                                    <h3 className="text-lg font-semibold">
+                                        Product List
+                                    </h3>
+                                    <Select
+                                        value={filters.category_id || "all"}
+                                        onValueChange={handleCategoryChange}
+                                    >
+                                        <SelectTrigger className="w-[200px]">
+                                            <SelectValue placeholder="Filter by category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">
+                                                All Categories
+                                            </SelectItem>
+                                            {categories.map((category) => (
+                                                <SelectItem
+                                                    key={category.id}
+                                                    value={category.id.toString()}
+                                                >
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-
-                                <CardDescription className="text-sm text-muted-foreground mt-2">
-                                    {product.description}
-                                </CardDescription>
-                            </CardHeader>
-
-                            <CardContent>
-                                <img
-                                    src={`/${product.imagePath}`}
-                                    alt={product.name}
-                                    className="w-full h-48 rounded-md border"
-                                    loading="lazy"
-                                />
-                            </CardContent>
-                            <CardFooter className="mt-auto">
                                 <Button
-                                    className="w-full bg-amber-600 hover:bg-amber-600 text-white font-semibold transition-colors duration-200"
-                                    variant="default"
+                                    onClick={() =>
+                                        router.visit(route("products.create"))
+                                    }
+                                    className="bg-blue-500 hover:bg-blue-600"
                                 >
-                                    Add to cart - ${product.price}
+                                    Add Product
                                 </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {products.data.map((product) => (
+                                    <Card
+                                        key={product.id}
+                                        className="flex flex-col"
+                                    >
+                                        {product.image && (
+                                            <div className="relative h-48 w-full">
+                                                <img
+                                                    src={product.image}
+                                                    alt={product.name}
+                                                    className="absolute inset-0 h-full w-full object-cover rounded-t-lg"
+                                                />
+                                            </div>
+                                        )}
+                                        <CardHeader>
+                                            <CardTitle>
+                                                {product.name}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {product.category
+                                                    ? product.category.name
+                                                    : "No Category"}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="flex-grow">
+                                            <p className="text-sm text-gray-600 mb-2">
+                                                {product.description}
+                                            </p>
+                                            <p className="text-lg font-semibold text-blue-600">
+                                                ${product.price}
+                                            </p>
+                                        </CardContent>
+                                        <CardFooter className="flex flex-col gap-2">
+                                            <Button
+                                                className="w-full bg-blue-500 hover:bg-blue-600"
+                                                onClick={() =>
+                                                    addToCart(product)
+                                                }
+                                            >
+                                                <ShoppingCart className="w-4 h-4 mr-2" />
+                                                Add to Cart
+                                            </Button>
+                                            <div className="flex justify-between w-full">
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                        router.visit(
+                                                            route(
+                                                                "products.edit",
+                                                                product.id
+                                                            )
+                                                        )
+                                                    }
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    onClick={() =>
+                                                        handleDelete(product.id)
+                                                    }
+                                                    disabled={processing}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </div>
+
+                            {products.data.length === 0 && (
+                                <div className="text-center py-8 text-gray-500">
+                                    No products found.
+                                </div>
+                            )}
+
+                            {/* Pagination Links */}
+                            {products.links && (
+                                <div className="mt-6">
+                                    {/* Add your pagination component here */}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

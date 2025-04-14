@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Producs;
+use App\Models\Product;
+use App\Models\Products;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ProducsSeeder extends Seeder
+class ProductsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -99,7 +100,7 @@ class ProducsSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
-            Producs::create($product);
+            Product::create($product);
         }
     }
 }

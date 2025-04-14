@@ -2,70 +2,112 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Producs;
-use App\Http\Requests\StoreProducsRequest;
-use App\Http\Requests\UpdateProducsRequest;
 use App\Http\Resources\ProductsResource;
+use App\Models\Product;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProductsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $query = Producs::query();
-        $products = $query->paginate(10)->onEachSide(1);
-        return inertia('Products/Index',[
-            "products"=> ProductsResource::collection($products),
+        $query = Product::with(['category', 'createdBy', 'updatedBy']);
+        
+        if ($request->has('category_id') && $request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+        
+        $products = $query->get();
+        Log::info('Products index called', ['count' => $products->count()]);
+        
+        return Inertia::render('Products/Index', [
+            'products' => ProductsResource::collection($products),
+            'categories' => Category::all(),
+            'filters' => $request->only(['category_id'])
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return Inertia::render('Products/Create', [
+            'categories' => Category::all()
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreProducsRequest $request)
+    public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image'] = Storage::url($path);
+        }
+
+        $validated['created_by'] = auth()->id();
+        $validated['updated_by'] = auth()->id();
+
+        $product = Product::create($validated);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Producs $producs)
+    public function edit(Product $product)
     {
-        //
+        return Inertia::render('Products/Edit', [
+            'product' => new ProductsResource($product),
+            'categories' => Category::all()
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Producs $producs)
+    public function update(Request $request, Product $product)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($product->image) {
+                $oldPath = str_replace('/storage/', '', $product->image);
+                Storage::disk('public')->delete($oldPath);
+            }
+            
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image'] = Storage::url($path);
+        }
+
+        $validated['updated_by'] = auth()->id();
+
+        $product->update($validated);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProducsRequest $request, Producs $producs)
+    public function destroy(Product $product)
     {
-        //
-    }
+        if ($product->image) {
+            $path = str_replace('/storage/', '', $product->image);
+            Storage::disk('public')->delete($path);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Producs $producs)
-    {
-        //
+        $product->delete();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product deleted successfully.');
     }
-}
+} 
